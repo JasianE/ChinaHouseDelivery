@@ -7,6 +7,7 @@ interface DeliveryDriverRow {
   created_at: string;
   id: number;
   name: string;
+  status: string;
   restaurant_id: number;
   updated_at: string;
 }
@@ -24,7 +25,7 @@ const listDriversQuery = async (
 ): Promise<DeliveryDriverRow[]> => {
   if (restaurantId === undefined) {
     const result = await pool.query<DeliveryDriverRow>(
-      "SELECT id, restaurant_id, name, created_at, updated_at FROM delivery_drivers ORDER BY id",
+      "SELECT id, restaurant_id, name, status, created_at, updated_at FROM delivery_drivers ORDER BY id",
     );
     return result.rows;
   }
@@ -102,4 +103,30 @@ export const listDriverRunsService = async (
   const driverId = requireInt(driverIdParam, "Invalid driver id");
   const dayId = optionalInt(dayIdQuery, "Invalid day_id");
   return listRunsForDriver(driverId, dayId);
+};
+
+export const updateDriverStatus = async (
+  driverIdParam: unknown,
+  driverStatusParam: unknown
+) => {
+  const driverId = requireInt(driverIdParam, "Invalid driver id");
+  const driverStatus = requireText(driverStatusParam, "Invalid driver status");
+
+  // Status check
+  const allowedStatuses = new Set(["ready", "out_for_run"]);
+  if (!allowedStatuses.has(driverStatus)) {
+    throw new ServiceError(400, "Invalid driver status");
+  }
+
+  const result = await pool.query<DeliveryDriverRow>(
+    "UPDATE delivery_drivers SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id, restaurant_id, name, status, created_at, updated_at",
+    [driverStatus, driverId],
+  );
+
+  const row = result.rows.at(0);
+  if (!row) {
+    throw new ServiceError(404, "Driver not found");
+  }
+
+  return row;
 };

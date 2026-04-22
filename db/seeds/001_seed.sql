@@ -6,11 +6,16 @@ INSERT INTO days (service_date)
 VALUES ('2026-04-21'), ('2026-04-22')
 ON CONFLICT (service_date) DO NOTHING;
 
-WITH bloor AS (
-  SELECT id FROM restaurants WHERE name = 'Bloor'
-)
 INSERT INTO delivery_drivers (name, restaurant_id)
-SELECT 'Dennis', id FROM bloor
+SELECT v.name, r.id
+FROM (
+  VALUES
+    ('Dennis', 'Bloor'),
+    ('Alice', 'Bloor'),
+    ('Maya', 'Sheppard'),
+    ('Jamal', 'Eglinton')
+) AS v(name, restaurant_name)
+JOIN restaurants r ON r.name = v.restaurant_name
 ON CONFLICT (name, restaurant_id) DO NOTHING;
 
 WITH driver AS (
@@ -43,8 +48,8 @@ WITH run1 AS (
     AND dd.name = 'Dennis'
   LIMIT 1
 )
-INSERT INTO delivery_orders (run_id, order_number, status)
-SELECT run1.id, 1, 'in_progress'::order_status FROM run1
+INSERT INTO delivery_orders (run_id, order_number, address_value, status)
+SELECT run1.id, 1, '17 somers', 'in_progress'::order_status FROM run1
 UNION ALL
-SELECT run2.id, 2, 'completed'::order_status FROM run2
+SELECT run2.id, 2, '19 somers', 'completed'::order_status FROM run2
 ON CONFLICT (order_number, run_id) DO NOTHING;

@@ -25,3 +25,14 @@ app.use("/api/orders", ordersRoutes);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+/**
+ * TODO:
+ * GOAL: Implemenet the plan out optimal map route endpoint given the runs and addresses 
+ * This will require
+ * - Each driver having a properly formatted address
+ * - Each run having an array of orders of addresses that we can access
+ * - A way to send this or calculate it to find the total shortest path
+ * - An OWNERS model / user that can be used to view the runners --> later
+ * - other stuff, lots to do but good to get started
+ */

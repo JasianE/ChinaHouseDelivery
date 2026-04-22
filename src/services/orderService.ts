@@ -6,13 +6,13 @@ import {
   optionalOrderStatus,
   type OrderStatus,
   requireInt,
-  requireText,
 } from "./serviceUtils.js";
 
 interface DeliveryOrderRow {
   created_at: string;
   id: number;
   order_number: string;
+  address_value: string;
   run_id: number;
   status: OrderStatus;
   updated_at: string;
@@ -41,7 +41,7 @@ const listOrdersQuery = async (
 
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
   const result = await pool.query<DeliveryOrderRow>(
-    `SELECT id, run_id, order_number, status, created_at, updated_at FROM delivery_orders ${where} ORDER BY id`,
+    `SELECT id, run_id, order_number, address_value, status, created_at, updated_at FROM delivery_orders ${where} ORDER BY id`,
     params,
   );
   return result.rows;
@@ -68,7 +68,7 @@ export const listRunOrdersService = (
 export const getOrderService = async (idParam: unknown) => {
   const id = requireInt(idParam, "Invalid order id");
   const result = await pool.query<DeliveryOrderRow>(
-    "SELECT id, run_id, order_number, status, created_at, updated_at FROM delivery_orders WHERE id = $1",
+    "SELECT id, run_id, order_number, address_value, status, created_at, updated_at FROM delivery_orders WHERE id = $1",
     [id],
   );
   const row = result.rows.at(0);
@@ -93,3 +93,20 @@ export const createOrderService = async (
   );
   return result.rows[0];
 };
+
+export const deleteOrderService = async (
+    runIdInput: unknown,
+    orderNumberInput: unknown
+) => {
+
+    const runId = requireInt(runIdInput, "run_id is required");
+    //const orderNumber = requireInt(orderNumberInput, "order_number is required");
+    const orderNumber = orderNumberInput;
+    const result = await pool.query<DeliveryOrderRow>(
+        "DELETE FROM delivery_orders WHERE run_id = $1 AND order_number = $2 RETURNING id, run_id, order_number, status, created_at, updated_at",
+        [runId, orderNumber]
+    );
+
+    return result.rows[0];
+}
+

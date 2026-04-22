@@ -1,5 +1,6 @@
 import {
   createOrderService,
+  deleteOrderService,
   getOrderService,
   listOrdersService,
 } from "#services/orderService.js";
@@ -8,6 +9,7 @@ import {
   type ApiRequestHandler,
   handleControllerError,
 } from "./controllerUtils.js";
+
 
 export const listOrdersHandler: ApiRequestHandler = async (req, res) => {
   try {
@@ -39,3 +41,15 @@ export const createOrderHandler: ApiRequestHandler = async (req, res) => {
     handleControllerError(res, error);
   }
 };
+
+export const deleteOrderHandler: ApiRequestHandler = async (req, res) => {
+  try {
+    const row = await deleteOrderService(
+      req.body?.run_id,
+      req.body?.order_number
+    );
+    res.status(201).json(row);
+  } catch (error){
+    handleControllerError(res, error);
+  }
+}

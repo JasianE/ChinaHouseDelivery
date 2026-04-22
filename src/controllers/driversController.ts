@@ -3,6 +3,7 @@ import {
   getDriverService,
   listDriverRunsService,
   listDriversService,
+  updateDriverStatus,
 } from "#services/driverService.js";
 
 import {
@@ -48,3 +49,12 @@ export const listDriverRunsHandler: ApiRequestHandler = async (req, res) => {
     handleControllerError(res, error);
   }
 };
+
+export const updateDriverHandler: ApiRequestHandler = async (req, res) => {
+  try {
+    const rows = await updateDriverStatus(req.body?.driverId, req.body?.status);
+    res.json(rows);
+  } catch (error) {
+    handleControllerError(res, error);
+  }
+}
