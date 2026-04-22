@@ -70,3 +70,9 @@ export const createRunService = async (
   );
   return result.rows[0];
 };
+
+export const calculateBestPathService = async (
+  runId: unknown,
+) => {
+  // do something w/ writing sql manually, then getting all those addresses and then inputting them into google maps api or something, then that will generate the best route and a link to it, i guess?
+};

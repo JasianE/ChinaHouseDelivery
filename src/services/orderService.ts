@@ -6,6 +6,7 @@ import {
   optionalOrderStatus,
   type OrderStatus,
   requireInt,
+  requireText,
 } from "./serviceUtils.js";
 
 interface DeliveryOrderRow {
@@ -78,18 +79,33 @@ export const getOrderService = async (idParam: unknown) => {
   return row;
 };
 
+export const getAllRunOrdersService = async (idParam: unknown) => {
+  const runId = requireInt(idParam, "Invalid run id");
+
+  const result = await pool.query<DeliveryOrderRow>(
+    "SELECT id, run_id, order_number, address_value, status, created_at, updated_at FROM delivery_orders WHERE run_id = $1",
+    [runId],
+  );
+  return result.rows;
+}
+
 export const createOrderService = async (
   runIdInput: unknown,
   orderNumberInput: unknown,
+  address_value: unknown,
   statusInput: unknown,
 ) => {
+
   const runId = requireInt(runIdInput, "run_id is required");
   const orderNumber = requireInt(orderNumberInput, "order_number is required");
+  const address = requireText(address_value, "address value is required");
+
   const status =
     optionalOrderStatus(statusInput, "Invalid status") ?? "in_progress";
+
   const result = await pool.query<DeliveryOrderRow>(
-    "INSERT INTO delivery_orders (run_id, order_number, status) VALUES ($1, $2, $3) RETURNING id, run_id, order_number, status, created_at, updated_at",
-    [runId, orderNumber, status],
+    "INSERT INTO delivery_orders (run_id, order_number, address_value, status) VALUES ($1, $2, $3, $4) RETURNING id, run_id, order_number, address_value, status, created_at, updated_at",
+    [runId, orderNumber, address, status],
   );
   return result.rows[0];
 };

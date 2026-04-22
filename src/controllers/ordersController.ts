@@ -1,6 +1,7 @@
 import {
   createOrderService,
   deleteOrderService,
+  getAllRunOrdersService,
   getOrderService,
   listOrdersService,
 } from "#services/orderService.js";
@@ -29,11 +30,21 @@ export const getOrderHandler: ApiRequestHandler = async (req, res) => {
   }
 };
 
+export const getRunOrderHandler: ApiRequestHandler = async (req, res) => {
+  try {
+    const rows = await getAllRunOrdersService(req.params.id);
+    res.json(rows);
+  } catch (error){
+    handleControllerError(res, error);
+  }
+}
+
 export const createOrderHandler: ApiRequestHandler = async (req, res) => {
   try {
     const row = await createOrderService(
       req.body?.run_id,
       req.body?.order_number,
+      req.body?.address_value,
       req.body?.status,
     );
     res.status(201).json(row);
