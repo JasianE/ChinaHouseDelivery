@@ -12,6 +12,9 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "db:migrate": "tsx --env-file .env scripts/db.ts migrate",
+    "db:seed": "tsx --env-file .env scripts/db.ts seed",
+    "db:setup": "npm run db:migrate && npm run db:seed",
     "test": "vitest",
     "test:run": "vitest --run",
     "test:ui": "vitest --ui",
@@ -35,13 +38,16 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "helmet": "^8.1.0",
-    "morgan": "^1.10.1"
+    "morgan": "^1.10.1",
+    "pg": "^8.20.0",
+    "pg-promise": "^12.6.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tsconfig/node22": "^22.0.5",
     "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
     "@vitest/coverage-v8": "^4.1.4",
     "@vitest/eslint-plugin": "^1.6.16",
     "eslint": "^10.2.1",

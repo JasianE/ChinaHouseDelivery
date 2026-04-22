@@ -1,5 +1,6 @@
 
 import { describe, expect, it } from "vitest";
+
 import { sum } from "#utils/sum.js";
 
 describe("sum function", () => {
