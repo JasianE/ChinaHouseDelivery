@@ -1,4 +1,5 @@
 import pool from "#db/pool.js";
+import { DeliveryOrderRow } from "#interfaces/interfaces.js";
 
 import { ServiceError } from "./serviceErrors.js";
 import {
@@ -9,15 +10,7 @@ import {
   requireText,
 } from "./serviceUtils.js";
 
-interface DeliveryOrderRow {
-  created_at: string;
-  id: number;
-  order_number: string;
-  address_value: string;
-  run_id: number;
-  status: OrderStatus;
-  updated_at: string;
-}
+
 
 interface OrderFilters {
   runId?: number;
@@ -87,7 +80,7 @@ export const getAllRunOrdersService = async (idParam: unknown) => {
     [runId],
   );
   return result.rows;
-}
+};
 
 export const createOrderService = async (
   runIdInput: unknown,
@@ -95,7 +88,6 @@ export const createOrderService = async (
   address_value: unknown,
   statusInput: unknown,
 ) => {
-
   const runId = requireInt(runIdInput, "run_id is required");
   const orderNumber = requireInt(orderNumberInput, "order_number is required");
   const address = requireText(address_value, "address value is required");
@@ -111,18 +103,16 @@ export const createOrderService = async (
 };
 
 export const deleteOrderService = async (
-    runIdInput: unknown,
-    orderNumberInput: unknown
+  runIdInput: unknown,
+  orderNumberInput: unknown,
 ) => {
+  const runId = requireInt(runIdInput, "run_id is required");
+  //const orderNumber = requireInt(orderNumberInput, "order_number is required");
+  const orderNumber = orderNumberInput;
+  const result = await pool.query<DeliveryOrderRow>(
+    "DELETE FROM delivery_orders WHERE run_id = $1 AND order_number = $2 RETURNING id, run_id, order_number, status, created_at, updated_at",
+    [runId, orderNumber],
+  );
 
-    const runId = requireInt(runIdInput, "run_id is required");
-    //const orderNumber = requireInt(orderNumberInput, "order_number is required");
-    const orderNumber = orderNumberInput;
-    const result = await pool.query<DeliveryOrderRow>(
-        "DELETE FROM delivery_orders WHERE run_id = $1 AND order_number = $2 RETURNING id, run_id, order_number, status, created_at, updated_at",
-        [runId, orderNumber]
-    );
-
-    return result.rows[0];
-}
-
+  return result.rows[0];
+};

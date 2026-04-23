@@ -1,5 +1,6 @@
 import { listRunOrdersService } from "#services/orderService.js";
 import {
+  calculateBestPathService,
   createRunService,
   getRunService,
   listRunsService,
@@ -45,3 +46,12 @@ export const listRunOrdersHandler: ApiRequestHandler = async (req, res) => {
     handleControllerError(res, error);
   }
 };
+
+export const calculateBestPathHandler: ApiRequestHandler = async (req, res) => {
+  try {
+    const rows = await calculateBestPathService(req.params.id);
+    res.json(rows);
+  } catch (errror){
+    handleControllerError(res, errror);
+  }
+}

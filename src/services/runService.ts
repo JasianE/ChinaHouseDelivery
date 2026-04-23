@@ -1,4 +1,5 @@
 import pool from "#db/pool.js";
+import { DeliveryOrderRow } from "#interfaces/interfaces.js";
 
 import { ServiceError } from "./serviceErrors.js";
 import { optionalInt, requireInt } from "./serviceUtils.js";
@@ -72,7 +73,16 @@ export const createRunService = async (
 };
 
 export const calculateBestPathService = async (
-  runId: unknown,
+  runIdInput: unknown,
 ) => {
+  const runId = requireInt(runIdInput, "run_id is required");
+
+  const result = await pool.query<DeliveryOrderRow>(
+    "SELECT id, run_id, order_number, address_value, status, created_at, updated_at FROM delivery_orders WHERE run_id = $1",
+    [runId],
+  );
+  
+  const addresses = result.rows.map((key : DeliveryOrderRow) => key.address_value);
+  console.log(addresses)
   // do something w/ writing sql manually, then getting all those addresses and then inputting them into google maps api or something, then that will generate the best route and a link to it, i guess?
 };
